@@ -1,6 +1,9 @@
+using AppCore.Models;
+
 namespace AppCore.Interfaces;
 
-public interface CustomerService
+public interface ICustomerService
 {
-    
+    public IEnumerable<Customer> GetCustomers();
+    public Task<IEnumerable<Customer>> GetCustomersAsync();
 }

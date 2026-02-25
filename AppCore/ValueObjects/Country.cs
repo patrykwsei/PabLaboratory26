@@ -1,6 +1,6 @@
 namespace AppCore.ValueObjects;
 
-public class Country
+public enum Country
 {
-    
+    PL, GB, US,
 }
