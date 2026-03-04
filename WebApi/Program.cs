@@ -1,5 +1,8 @@
-using AppCore.Interfaces;
-using Infrastructure.Memory;
+using AppCore;
+using AppCore.Models.Contacts;
+using AppCore.Repositories;
+using Infrastructure.Memory.Repositories;
+
 
 namespace WebApi;
 
@@ -11,7 +14,11 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddAuthorization();
-        builder.Services.AddSingleton<ICustomerService, MemoryCustomerService>();
+        builder.Services.AddSingleton<IContactRepository, MemoryContactRepository>();
+        builder.Services.AddSingleton<IPersonRepository, MemoryPersonRepository>();
+        builder.Services.AddSingleton<ICompanyRepository, MemoryCompanyRepository>();
+        builder.Services.AddSingleton<IOrganizationRepository, MemoryOrganizationRepository>();
+        builder.Services.AddOpenApi();
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
@@ -28,12 +35,18 @@ public class Program
 
         app.UseAuthorization();
         
-        app.MapGet("/api/customers", (ICustomerService service,HttpContext httpContext) =>
+        app.MapGet("/", () =>
+        {
+            var person = new Person
             {
-                return service.GetCustomers();
-            })
-            .WithName("GetCustomers");
+                FirstName = "Jan",
+                LastName = "Kowalski",
+                Email = "jan@test.pl"
+            };
 
+            return person.GetDisplayName();
+        });
+           
         app.Run();
     }
 }
