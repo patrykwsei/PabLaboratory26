@@ -1,60 +1,48 @@
 using AppCore.Dto;
 using AppCore.Models.Contacts;
 using AppCore.Repositories;
+using Infrastructure.Memory;
 
 namespace Infrastructure.Memory.Repositories;
 
 public class MemoryContactRepository : MemoryGenericRepository<Contact>, IContactRepository
 {
+    public MemoryContactRepository(MemoryDataStore store) : base(store.Contacts)
+    {
+    }
+
     public Task<PagedResult<Contact>> SearchAsync(ContactSearchDto search)
     {
-        var q = _data.Values.AsEnumerable();
+        var query = _data.Values.AsEnumerable();
 
         if (!string.IsNullOrWhiteSpace(search.Query))
         {
-            var s = search.Query.Trim();
-            q = q.Where(c =>
-                (c.Email?.Contains(s, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                (c.Phone?.Contains(s, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                (c.GetDisplayName()?.Contains(s, StringComparison.OrdinalIgnoreCase) ?? false));
+            var text = search.Query.Trim();
+            query = query.Where(c =>
+                c.GetDisplayName().Contains(text, StringComparison.OrdinalIgnoreCase) ||
+                (c.Email?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (c.Phone?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false));
         }
 
-        if (search.Status is not null)
-            q = q.Where(c => c.Status == search.Status);
-
-        if (!string.IsNullOrWhiteSpace(search.Tag))
-        {
-            var tag = search.Tag.Trim();
-            q = q.Where(c => c.Tags.Any(t => string.Equals(t.Name, tag, StringComparison.OrdinalIgnoreCase)));
-        }
-
-        if (!string.IsNullOrWhiteSpace(search.ContactType))
-        {
-            var type = search.ContactType.Trim();
-            q = q.Where(c => string.Equals(c.GetType().Name, type, StringComparison.OrdinalIgnoreCase));
-        }
-
-        var total = q.Count();
+        var totalCount = query.Count();
 
         var page = search.Page <= 0 ? 1 : search.Page;
-        var pageSize = search.PageSize <= 0 ? 20 : search.PageSize;
+        var pageSize = search.PageSize <= 0 ? 10 : search.PageSize;
 
-        var items = q
+        var items = query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToList();
 
-        return Task.FromResult(new PagedResult<Contact>(items, total, page, pageSize));
+        return Task.FromResult(new PagedResult<Contact>(items, totalCount, page, pageSize));
     }
 
     public Task<IEnumerable<Contact>> FindByTagAsync(string tag)
     {
-        tag = tag?.Trim() ?? "";
         var result = _data.Values
-            .Where(c => c.Tags.Any(t => string.Equals(t.Name, tag, StringComparison.OrdinalIgnoreCase)))
-            .AsEnumerable();
+            .Where(c => c.Tags.Any(t => t.Name.Equals(tag, StringComparison.OrdinalIgnoreCase)));
 
-        return Task.FromResult(result);
+        return Task.FromResult(result.AsEnumerable());
     }
 
     public Task AddNoteAsync(Guid contactId, Note note)
@@ -80,11 +68,7 @@ public class MemoryContactRepository : MemoryGenericRepository<Contact>, IContac
         if (!_data.TryGetValue(contactId, out var contact))
             throw new KeyNotFoundException($"Contact with Id={contactId} not found.");
 
-        tag = tag?.Trim() ?? "";
-        if (string.IsNullOrWhiteSpace(tag)) return Task.CompletedTask;
-
-        // żeby nie dublować tagów
-        if (!contact.Tags.Any(t => string.Equals(t.Name, tag, StringComparison.OrdinalIgnoreCase)))
+        if (!contact.Tags.Any(t => t.Name.Equals(tag, StringComparison.OrdinalIgnoreCase)))
         {
             contact.Tags.Add(new Tag { Name = tag });
             contact.UpdatedAt = DateTime.UtcNow;
@@ -98,8 +82,7 @@ public class MemoryContactRepository : MemoryGenericRepository<Contact>, IContac
         if (!_data.TryGetValue(contactId, out var contact))
             throw new KeyNotFoundException($"Contact with Id={contactId} not found.");
 
-        tag = tag?.Trim() ?? "";
-        contact.Tags.RemoveAll(t => string.Equals(t.Name, tag, StringComparison.OrdinalIgnoreCase));
+        contact.Tags.RemoveAll(t => t.Name.Equals(tag, StringComparison.OrdinalIgnoreCase));
         contact.UpdatedAt = DateTime.UtcNow;
 
         return Task.CompletedTask;
