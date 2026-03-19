@@ -1,53 +1,60 @@
 ﻿using AppCore.Dto;
-using AppCore.Models.Contacts;
-using AppCore.Repositories;
+using AppCore.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
-public class ContactsController : ControllerBase
+[Route("/api/contacts")]
+public class ContactsController(IPersonService service) : ControllerBase
 {
-    private readonly IContactRepository _contactRepository;
-
-    public ContactsController(IContactRepository contactRepository)
+    [HttpGet]
+    public async Task<IActionResult> GetAllPersons([FromQuery] int page = 1, [FromQuery] int size = 20)
     {
-        _contactRepository = contactRepository;
-    }
-
-    [HttpGet("search")]
-    public async Task<ActionResult<PagedResult<Contact>>> Search([FromQuery] ContactSearchDto dto)
-    {
-        var result = await _contactRepository.SearchAsync(dto);
+        var result = await service.FindAllPeoplePaged(page, size);
         return Ok(result);
     }
 
-    [HttpPost("{id:guid}/tags")]
-    public async Task<IActionResult> AddTag(Guid id, [FromBody] string tag)
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetPerson(Guid id)
     {
-        await _contactRepository.AddTagAsync(id, tag);
-        return NoContent();
+        var dto = await service.GetById(id);
+
+        if (dto is null)
+            return NotFound();
+
+        return Ok(dto);
     }
 
-    [HttpDelete("{id:guid}/tags/{tag}")]
-    public async Task<IActionResult> RemoveTag(Guid id, string tag)
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] CreatePersonDto dto)
     {
-        await _contactRepository.RemoveTagAsync(id, tag);
-        return NoContent();
+        var result = await service.AddPerson(dto);
+        var createdDto = await service.GetById(result.Id);
+
+        return CreatedAtAction(nameof(GetPerson), new { id = result.Id }, createdDto);
     }
 
-    [HttpPost("{id:guid}/notes")]
-    public async Task<IActionResult> AddNote(Guid id, [FromBody] string content)
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdatePersonDto dto)
     {
-        await _contactRepository.AddNoteAsync(id, new Note { Content = content });
-        return NoContent();
+        var result = await service.UpdatePerson(id, dto);
+
+        if (result is null)
+            return NotFound();
+
+        var updatedDto = await service.GetById(id);
+        return Ok(updatedDto);
     }
 
-    [HttpGet("{id:guid}/notes")]
-    public async Task<ActionResult<IEnumerable<Note>>> GetNotes(Guid id)
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id)
     {
-        var notes = await _contactRepository.GetNotesAsync(id);
-        return Ok(notes);
+        var deleted = await service.DeletePerson(id);
+
+        if (!deleted)
+            return NotFound();
+
+        return NoContent();
     }
 }

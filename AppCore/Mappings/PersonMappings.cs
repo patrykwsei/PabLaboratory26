@@ -1,7 +1,7 @@
 ﻿using AppCore.Dto;
 using AppCore.Models.Contacts;
 
-namespace WebApi.Mappers;
+namespace AppCore.Mappings;
 
 public static class PersonMappings
 {

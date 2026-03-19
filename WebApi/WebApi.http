@@ -1,6 +1,52 @@
 @WebApi_HostAddress = http://localhost:5288
 
-GET {{WebApi_HostAddress}}/weatherforecast/
+GET {{WebApi_HostAddress}}/api/contacts?page=1&size=10
 Accept: application/json
 
 ###
+
+POST {{WebApi_HostAddress}}/api/contacts
+Content-Type: application/json
+
+{
+  "firstName": "Adam",
+  "lastName": "Nowak",
+  "email": "adam@wsei.edu.pl",
+  "phone": "123456789",
+  "position": "Student",
+  "birthDate": "2000-01-01T00:00:00",
+  "gender": 0
+}
+
+###
+
+GET {{WebApi_HostAddress}}/api/contacts/0d6bb704-2ff9-490d-a4dc-b62c13e51f28
+Accept: application/json
+
+###
+
+PUT {{WebApi_HostAddress}}/api/contacts/0d6bb704-2ff9-490d-a4dc-b62c13e51f28
+Content-Type: application/json
+
+{
+  "firstName": "Jan",
+  "lastName": "Nowak",
+  "email": "jan@wsei.edu.pl",
+  "phone": "999999999",
+  "position": "Programista",
+  "gender": 0,
+  "status": 0
+}
+
+###
+
+DELETE {{WebApi_HostAddress}}/api/contacts/0d6bb704-2ff9-490d-a4dc-b62c13e51f28
+
+###
+
+POST {{WebApi_HostAddress}}/api/contacts
+Content-Type: application/json
+
+{
+  "firstName": "Adam"
+}

@@ -3,10 +3,10 @@ using AppCore.Models.Contacts.Enums;
 namespace AppCore.Dto;
 
 public record CreatePersonDto(
-    string FirstName,
-    string LastName,
-    string Email,
-    string Phone,
+    string? FirstName,
+    string? LastName,
+    string? Email,
+    string? Phone,
     string? Position,
     DateTime? BirthDate,
     Gender Gender,

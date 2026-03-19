@@ -1,5 +1,4 @@
 using AppCore.Models.Contacts.Enums;
-
 namespace AppCore.Dto;
 
 public record UpdatePersonDto(
