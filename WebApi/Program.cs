@@ -15,15 +15,15 @@ builder.Services.AddOpenApi();
 // rejestracja walidatorów (FluentValidation)
 builder.Services.AddContactsModule();
 
-// repozytoria
+builder.Services.AddSingleton<MemoryDataStore>();
 builder.Services.AddSingleton<IPersonRepository, MemoryPersonRepository>();
 builder.Services.AddSingleton<ICompanyRepository, MemoryCompanyRepository>();
 builder.Services.AddSingleton<IOrganizationRepository, MemoryOrganizationRepository>();
 
-// unit of work
+
 builder.Services.AddSingleton<IContactUnitOfWork, MemoryContactUnitOfWork>();
 
-// serwis
+
 builder.Services.AddSingleton<IPersonService, MemoryPersonService>();
 
 var app = builder.Build();

@@ -20,16 +20,16 @@ Content-Type: application/json
 
 ###
 
-GET {{WebApi_HostAddress}}/api/contacts/0d6bb704-2ff9-490d-a4dc-b62c13e51f28
+GET {{WebApi_HostAddress}}/api/contacts/cce85727-92e2-46e3-9618-82a891717f43
 Accept: application/json
 
 ###
 
-PUT {{WebApi_HostAddress}}/api/contacts/0d6bb704-2ff9-490d-a4dc-b62c13e51f28
+PUT {{WebApi_HostAddress}}/api/contacts/cce85727-92e2-46e3-9618-82a891717f43
 Content-Type: application/json
 
 {
-  "firstName": "Jan",
+  "firstName": "Marcin",
   "lastName": "Nowak",
   "email": "jan@wsei.edu.pl",
   "phone": "999999999",
@@ -40,7 +40,7 @@ Content-Type: application/json
 
 ###
 
-DELETE {{WebApi_HostAddress}}/api/contacts/0d6bb704-2ff9-490d-a4dc-b62c13e51f28
+DELETE {{WebApi_HostAddress}}/api/contacts/cce85727-92e2-46e3-9618-82a891717f43
 
 ###
 
