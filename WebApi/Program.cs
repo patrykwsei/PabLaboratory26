@@ -1,55 +1,40 @@
 using AppCore.Interfaces;
+using AppCore.Module;
 using AppCore.Repositories;
 using AppCore.Services;
-using AppCore.Validators;
-using FluentValidation;
-using FluentValidation.AspNetCore;
-using Infrastructure.Memory;
 using Infrastructure.Memory.Repositories;
+using Infrastructure.Memory;
 using Infrastructure.Services;
 
-namespace WebApi;
+var builder = WebApplication.CreateBuilder(args);
 
-public class Program
+builder.Services.AddAuthorization();
+builder.Services.AddControllers();
+builder.Services.AddOpenApi();
+
+// rejestracja walidatorów (FluentValidation)
+builder.Services.AddContactsModule();
+
+// repozytoria
+builder.Services.AddSingleton<IPersonRepository, MemoryPersonRepository>();
+builder.Services.AddSingleton<ICompanyRepository, MemoryCompanyRepository>();
+builder.Services.AddSingleton<IOrganizationRepository, MemoryOrganizationRepository>();
+
+// unit of work
+builder.Services.AddSingleton<IContactUnitOfWork, MemoryContactUnitOfWork>();
+
+// serwis
+builder.Services.AddSingleton<IPersonService, MemoryPersonService>();
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
 {
-    public static void Main(string[] args)
-    {
-        var builder = WebApplication.CreateBuilder(args);
-
-        builder.Services.AddAuthorization();
-
-        builder.Services.AddControllers();
-        builder.Services.AddFluentValidationAutoValidation();
-        builder.Services.AddFluentValidationClientsideAdapters();
-
-        builder.Services.AddScoped<IValidator<AppCore.Dto.CreatePersonDto>, CreatePersonDtoValidator>();
-        builder.Services.AddScoped<IValidator<AppCore.Dto.UpdatePersonDto>, UpdatePersonDtoValidator>();
-
-        builder.Services.AddOpenApi();
-
-        builder.Services.AddSingleton<MemoryDataStore>();
-
-        builder.Services.AddSingleton<IContactRepository, MemoryContactRepository>();
-        builder.Services.AddSingleton<IPersonRepository, MemoryPersonRepository>();
-        builder.Services.AddSingleton<ICompanyRepository, MemoryCompanyRepository>();
-        builder.Services.AddSingleton<IOrganizationRepository, MemoryOrganizationRepository>();
-
-        builder.Services.AddSingleton<IContactUnitOfWork, MemoryContactUnitOfWork>();
-        builder.Services.AddSingleton<IPersonService, MemoryPersonService>();
-
-        var app = builder.Build();
-
-        if (app.Environment.IsDevelopment())
-        {
-            app.MapOpenApi();
-        }
-
-        app.UseHttpsRedirection();
-        app.UseAuthorization();
-        app.MapControllers();
-
-        app.MapGet("/", () => "api dziala");
-
-        app.Run();
-    }
+    app.MapOpenApi();
 }
+
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
+
+app.Run();

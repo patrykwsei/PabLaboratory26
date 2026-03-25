@@ -18,16 +18,39 @@ public class MemoryContactRepository : MemoryGenericRepository<Contact>, IContac
         if (!string.IsNullOrWhiteSpace(search.Query))
         {
             var text = search.Query.Trim();
+
             query = query.Where(c =>
                 c.GetDisplayName().Contains(text, StringComparison.OrdinalIgnoreCase) ||
-                (c.Email?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                (c.Phone?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false));
+                c.Email.Contains(text, StringComparison.OrdinalIgnoreCase) ||
+                c.Phone.Contains(text, StringComparison.OrdinalIgnoreCase));
         }
 
-        var totalCount = query.Count();
+        if (search.Status.HasValue)
+        {
+            query = query.Where(c => c.Status == search.Status.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(search.Tag))
+        {
+            query = query.Where(c => c.Tags.Any(t =>
+                t.Name.Equals(search.Tag, StringComparison.OrdinalIgnoreCase)));
+        }
+
+        if (!string.IsNullOrWhiteSpace(search.ContactType))
+        {
+            query = search.ContactType.Trim().ToLower() switch
+            {
+                "person" => query.Where(c => c is Person),
+                "company" => query.Where(c => c is Company),
+                "organization" => query.Where(c => c is Organization),
+                _ => query
+            };
+        }
 
         var page = search.Page <= 0 ? 1 : search.Page;
-        var pageSize = search.PageSize <= 0 ? 10 : search.PageSize;
+        var pageSize = search.PageSize <= 0 ? 20 : search.PageSize;
+
+        var totalCount = query.Count();
 
         var items = query
             .Skip((page - 1) * pageSize)
