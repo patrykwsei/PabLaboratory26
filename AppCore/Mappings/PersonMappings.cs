@@ -28,7 +28,13 @@ public static class PersonMappings
                     person.Address.PostalCode,
                     person.Address.Country,
                     person.Address.Type),
-            Tags = person.Tags.Select(t => t.Name).ToList()
+            Tags = person.Tags.Select(t => t.Name).ToList(),
+            Notes = person.Notes.Select(n => new NoteDto
+            {
+                Id = n.Id,
+                Content = n.Content,
+                CreatedAt = n.CreatedAt
+            }).ToList()
         };
     }
 

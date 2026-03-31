@@ -1,12 +1,16 @@
 ﻿using AppCore.Dto;
 using AppCore.Services;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers;
 
 [ApiController]
 [Route("/api/contacts")]
-public class ContactsController(IPersonService service) : ControllerBase
+public class ContactsController(
+    IPersonService service,
+    IValidator<CreatePersonDto> createValidator,
+    IValidator<UpdatePersonDto> updateValidator) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAllPersons([FromQuery] int page = 1, [FromQuery] int size = 20)
@@ -29,6 +33,18 @@ public class ContactsController(IPersonService service) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreatePersonDto dto)
     {
+        var validationResult = await createValidator.ValidateAsync(dto);
+
+        if (!validationResult.IsValid)
+        {
+            foreach (var error in validationResult.Errors)
+            {
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+            }
+
+            return ValidationProblem(ModelState);
+        }
+
         var result = await service.AddPerson(dto);
         var createdDto = await service.GetById(result.Id);
 
@@ -38,6 +54,18 @@ public class ContactsController(IPersonService service) : ControllerBase
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdatePersonDto dto)
     {
+        var validationResult = await updateValidator.ValidateAsync(dto);
+
+        if (!validationResult.IsValid)
+        {
+            foreach (var error in validationResult.Errors)
+            {
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+            }
+
+            return ValidationProblem(ModelState);
+        }
+
         var result = await service.UpdatePerson(id, dto);
 
         if (result is null)
@@ -56,5 +84,37 @@ public class ContactsController(IPersonService service) : ControllerBase
             return NotFound();
 
         return NoContent();
+    }
+
+    [HttpPost("{contactId:guid}/notes")]
+    [ProducesResponseType(typeof(NoteDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> AddNote(
+        [FromRoute] Guid contactId,
+        [FromBody] CreateNoteDto dto)
+    {
+        var note = await service.AddNoteToPerson(contactId, dto);
+
+        var noteDto = new NoteDto
+        {
+            Id = note.Id,
+            Content = note.Content,
+            CreatedAt = note.CreatedAt
+        };
+
+        return CreatedAtAction(
+            nameof(GetNotes),
+            new { contactId },
+            noteDto);
+    }
+
+    [HttpGet("{contactId:guid}/notes")]
+    [ProducesResponseType(typeof(IEnumerable<NoteDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetNotes([FromRoute] Guid contactId)
+    {
+        var person = await service.GetPerson(contactId);
+        return Ok(person.Notes);
     }
 }

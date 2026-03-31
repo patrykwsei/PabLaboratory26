@@ -1,10 +1,10 @@
 @WebApi_HostAddress = http://localhost:5288
 
+### 1. pobranie listy kontaktow - stronicowanie
 GET {{WebApi_HostAddress}}/api/contacts?page=1&size=10
 Accept: application/json
 
-###
-
+### 2. dodanie osoby
 POST {{WebApi_HostAddress}}/api/contacts
 Content-Type: application/json
 
@@ -18,14 +18,12 @@ Content-Type: application/json
   "gender": 0
 }
 
-###
-
-GET {{WebApi_HostAddress}}/api/contacts/0d6bb704-2ff9-490d-a4dc-b62c13e51f28
+### 3. pobranie osoby p oid
+GET {{WebApi_HostAddress}}/api/contacts/c76d4824-e3b0-432c-bb23-934b8f2d910d
 Accept: application/json
 
-###
-
-PUT {{WebApi_HostAddress}}/api/contacts/0d6bb704-2ff9-490d-a4dc-b62c13e51f28
+### 4. edycja osoby po id
+PUT {{WebApi_HostAddress}}/api/contacts/c76d4824-e3b0-432c-bb23-934b8f2d910d
 Content-Type: application/json
 
 {
@@ -38,15 +36,47 @@ Content-Type: application/json
   "status": 0
 }
 
-###
+### 5. usunięcie po ID
+DELETE {{WebApi_HostAddress}}/api/contacts/c76d4824-e3b0-432c-bb23-934b8f2d910d
 
-DELETE {{WebApi_HostAddress}}/api/contacts/0d6bb704-2ff9-490d-a4dc-b62c13e51f28
-
-###
-
+### 6. test walidacji - błędny post
 POST {{WebApi_HostAddress}}/api/contacts
 Content-Type: application/json
 
 {
   "firstName": "Adam"
+}
+
+### 7. dodanie osoby na test notatek
+POST {{WebApi_HostAddress}}/api/contacts
+Content-Type: application/json
+
+{
+  "firstName": "Kamil",
+  "lastName": "Testowy",
+  "email": "kamil@wsei.edu.pl",
+  "phone": "555666777",
+  "position": "Tester",
+  "birthDate": "2000-05-10T00:00:00",
+  "gender": 0
+}
+
+### 8. dodanie notaki do osoby
+POST {{WebApi_HostAddress}}/api/contacts/34d3e231-adab-4a91-b830-dc0960ea27c9/notes
+Content-Type: application/json
+
+{
+  "content": "Moja pierwsza notatka"
+}
+
+### 9. pobranie notatek
+GET {{WebApi_HostAddress}}/api/contacts/34d3e231-adab-4a91-b830-dc0960ea27c9/notes
+Accept: application/json
+
+### 10. handler test - nie ma osoby
+POST {{WebApi_HostAddress}}/api/contacts/00000000-0000-0000-0000-000000000000/notes
+Content-Type: application/json
+
+{
+  "content": "test not found"
 }

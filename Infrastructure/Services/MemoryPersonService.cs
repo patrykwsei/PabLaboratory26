@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using AppCore.Dto;
+using AppCore.Exceptions;
 using AppCore.Interfaces;
 using AppCore.Mappings;
 using AppCore.Models.Contacts;
@@ -96,6 +97,16 @@ public class MemoryPersonService(IContactUnitOfWork unitOfWork) : IPersonService
         return entity?.ToDto();
     }
 
+    public async Task<PersonDto> GetPerson(Guid personId)
+    {
+        var entity = await unitOfWork.Persons.FindByIdAsync(personId);
+
+        if (entity is null)
+            throw new ContactNotFoundException($"Person with id={personId} not found!");
+
+        return entity.ToDto();
+    }
+
     public async Task<bool> DeletePerson(Guid id)
     {
         var entity = await unitOfWork.Persons.FindByIdAsync(id);
@@ -109,6 +120,31 @@ public class MemoryPersonService(IContactUnitOfWork unitOfWork) : IPersonService
         await unitOfWork.SaveChangesAsync();
 
         return true;
+    }
+
+    public async Task<Note> AddNoteToPerson(Guid personId, CreateNoteDto noteDto)
+    {
+        var person = await unitOfWork.Persons.FindByIdAsync(personId);
+
+        if (person is null)
+            throw new ContactNotFoundException($"Person with id={personId} not found!");
+
+        if (person.Notes is null)
+            person.Notes = new List<Note>();
+
+        var note = new Note
+        {
+            Id = Guid.NewGuid(),
+            Content = noteDto.Content,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        person.Notes.Add(note);
+
+        await unitOfWork.Persons.UpdateAsync(person);
+        await unitOfWork.SaveChangesAsync();
+
+        return note;
     }
 
     public async Task AddTag(Guid id, string tag)
