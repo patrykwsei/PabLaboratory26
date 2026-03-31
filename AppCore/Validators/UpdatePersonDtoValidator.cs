@@ -1,5 +1,4 @@
 ﻿using AppCore.Dto;
-using AppCore.Repositories;
 using AppCore.Validators.Shared;
 using FluentValidation;
 
@@ -7,12 +6,8 @@ namespace AppCore.Validators;
 
 public class UpdatePersonDtoValidator : AbstractValidator<UpdatePersonDto>
 {
-    private readonly ICompanyRepository _companyRepository;
-
-    public UpdatePersonDtoValidator(ICompanyRepository companyRepository)
+    public UpdatePersonDtoValidator()
     {
-        _companyRepository = companyRepository;
-
         When(x => x.FirstName is not null, () =>
         {
             RuleFor(x => x.FirstName!)
@@ -60,21 +55,8 @@ public class UpdatePersonDtoValidator : AbstractValidator<UpdatePersonDto>
             .When(x => x.Status.HasValue)
             .WithMessage("Nieprawidłowy status kontaktu.");
 
-        RuleFor(x => x.EmployerId)
-            .MustAsync(EmployerExistsAsync)
-            .WithMessage("Wskazana firma nie istnieje.")
-            .When(x => x.EmployerId.HasValue);
-
         RuleFor(x => x.Address)
             .SetValidator(new AddressDtoValidator()!)
             .When(x => x.Address is not null);
-    }
-
-    private async Task<bool> EmployerExistsAsync(Guid? employerId, CancellationToken ct)
-    {
-        if (!employerId.HasValue)
-            return true;
-
-        return await _companyRepository.FindByIdAsync(employerId.Value) is not null;
     }
 }

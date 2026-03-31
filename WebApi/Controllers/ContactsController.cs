@@ -1,16 +1,12 @@
 ﻿using AppCore.Dto;
 using AppCore.Services;
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers;
 
 [ApiController]
 [Route("/api/contacts")]
-public class ContactsController(
-    IPersonService service,
-    IValidator<CreatePersonDto> createValidator,
-    IValidator<UpdatePersonDto> updateValidator) : ControllerBase
+public class ContactsController(IPersonService service) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAllPersons([FromQuery] int page = 1, [FromQuery] int size = 20)
@@ -33,18 +29,6 @@ public class ContactsController(
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreatePersonDto dto)
     {
-        var validationResult = await createValidator.ValidateAsync(dto);
-
-        if (!validationResult.IsValid)
-        {
-            foreach (var error in validationResult.Errors)
-            {
-                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-            }
-
-            return ValidationProblem(ModelState);
-        }
-
         var result = await service.AddPerson(dto);
         var createdDto = await service.GetById(result.Id);
 
@@ -54,18 +38,6 @@ public class ContactsController(
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdatePersonDto dto)
     {
-        var validationResult = await updateValidator.ValidateAsync(dto);
-
-        if (!validationResult.IsValid)
-        {
-            foreach (var error in validationResult.Errors)
-            {
-                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-            }
-
-            return ValidationProblem(ModelState);
-        }
-
         var result = await service.UpdatePerson(id, dto);
 
         if (result is null)

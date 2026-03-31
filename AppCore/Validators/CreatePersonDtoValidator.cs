@@ -1,5 +1,4 @@
 ﻿using AppCore.Dto;
-using AppCore.Repositories;
 using AppCore.Validators.Shared;
 using FluentValidation;
 
@@ -7,12 +6,8 @@ namespace AppCore.Validators;
 
 public class CreatePersonDtoValidator : AbstractValidator<CreatePersonDto>
 {
-    private readonly ICompanyRepository _companyRepository;
-
-    public CreatePersonDtoValidator(ICompanyRepository companyRepository)
+    public CreatePersonDtoValidator()
     {
-        _companyRepository = companyRepository;
-
         RuleFor(x => x.FirstName)
             .NotEmpty().WithMessage("Imię jest wymagane.")
             .MaximumLength(100).WithMessage("Imię nie może przekraczać 100 znaków.")
@@ -44,21 +39,8 @@ public class CreatePersonDtoValidator : AbstractValidator<CreatePersonDto>
             .IsInEnum()
             .WithMessage("Nieprawidłowa wartość płci.");
 
-        RuleFor(x => x.EmployerId)
-            .MustAsync(EmployerExistsAsync)
-            .WithMessage("Wskazana firma nie istnieje.")
-            .When(x => x.EmployerId.HasValue);
-
         RuleFor(x => x.Address)
             .SetValidator(new AddressDtoValidator()!)
             .When(x => x.Address is not null);
-    }
-
-    private async Task<bool> EmployerExistsAsync(Guid? employerId, CancellationToken ct)
-    {
-        if (!employerId.HasValue)
-            return true;
-
-        return await _companyRepository.FindByIdAsync(employerId.Value) is not null;
     }
 }

@@ -19,15 +19,15 @@ Content-Type: application/json
 }
 
 ### 3. pobranie osoby p oid
-GET {{WebApi_HostAddress}}/api/contacts/c76d4824-e3b0-432c-bb23-934b8f2d910d
+GET {{WebApi_HostAddress}}/api/contacts/b308643e-154a-424e-b925-4f27d34f9330
 Accept: application/json
 
 ### 4. edycja osoby po id
-PUT {{WebApi_HostAddress}}/api/contacts/c76d4824-e3b0-432c-bb23-934b8f2d910d
+PUT {{WebApi_HostAddress}}/api/contacts/b308643e-154a-424e-b925-4f27d34f9330
 Content-Type: application/json
 
 {
-  "firstName": "Jan",
+  "firstName": "Janek",
   "lastName": "Nowak",
   "email": "jan@wsei.edu.pl",
   "phone": "999999999",
@@ -37,7 +37,7 @@ Content-Type: application/json
 }
 
 ### 5. usunięcie po ID
-DELETE {{WebApi_HostAddress}}/api/contacts/c76d4824-e3b0-432c-bb23-934b8f2d910d
+DELETE {{WebApi_HostAddress}}/api/contacts/b308643e-154a-424e-b925-4f27d34f9330
 
 ### 6. test walidacji - błędny post
 POST {{WebApi_HostAddress}}/api/contacts
@@ -62,15 +62,15 @@ Content-Type: application/json
 }
 
 ### 8. dodanie notaki do osoby
-POST {{WebApi_HostAddress}}/api/contacts/34d3e231-adab-4a91-b830-dc0960ea27c9/notes
+POST {{WebApi_HostAddress}}/api/contacts/ea121cbd-33ea-4b09-acda-af0b4e5f01a0/notes
 Content-Type: application/json
 
 {
-  "content": "Moja pierwsza notatka"
+  "content": "Fajna notatka"
 }
 
 ### 9. pobranie notatek
-GET {{WebApi_HostAddress}}/api/contacts/34d3e231-adab-4a91-b830-dc0960ea27c9/notes
+GET {{WebApi_HostAddress}}/api/contacts/ea121cbd-33ea-4b09-acda-af0b4e5f01a0/notes
 Accept: application/json
 
 ### 10. handler test - nie ma osoby
