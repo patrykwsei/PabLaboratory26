@@ -62,7 +62,7 @@ Content-Type: application/json
 }
 
 ### 8. dodanie notaki do osoby
-POST {{WebApi_HostAddress}}/api/contacts/ea121cbd-33ea-4b09-acda-af0b4e5f01a0/notes
+POST {{WebApi_HostAddress}}/api/contacts/48fa832a-2cd5-4580-9536-ce80fb4333a8/notes
 Content-Type: application/json
 
 {
@@ -70,7 +70,7 @@ Content-Type: application/json
 }
 
 ### 9. pobranie notatek
-GET {{WebApi_HostAddress}}/api/contacts/ea121cbd-33ea-4b09-acda-af0b4e5f01a0/notes
+GET {{WebApi_HostAddress}}/api/contacts/48fa832a-2cd5-4580-9536-ce80fb4333a8/notes
 Accept: application/json
 
 ### 10. handler test - nie ma osoby
@@ -80,3 +80,6 @@ Content-Type: application/json
 {
   "content": "test not found"
 }
+
+### 11. usuniecie notatki
+DELETE {{WebApi_HostAddress}}/api/contacts/48fa832a-2cd5-4580-9536-ce80fb4333a8/notes/4b32c10e-b619-42e0-a734-ea51ebe18e55

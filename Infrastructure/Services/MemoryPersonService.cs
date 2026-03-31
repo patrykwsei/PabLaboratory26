@@ -147,6 +147,24 @@ public class MemoryPersonService(IContactUnitOfWork unitOfWork) : IPersonService
         return note;
     }
 
+    public async Task DeleteNoteFromPerson(Guid personId, Guid noteId)
+    {
+        var person = await unitOfWork.Persons.FindByIdAsync(personId);
+
+        if (person is null)
+            throw new ContactNotFoundException($"Person with id={personId} not found!");
+
+        var note = person.Notes.FirstOrDefault(n => n.Id == noteId);
+
+        if (note is null)
+            throw new ContactNotFoundException($"Note with id={noteId} not found!");
+
+        person.Notes.Remove(note);
+
+        await unitOfWork.Persons.UpdateAsync(person);
+        await unitOfWork.SaveChangesAsync();
+    }
+
     public async Task AddTag(Guid id, string tag)
     {
         var person = await unitOfWork.Persons.FindByIdAsync(id);

@@ -13,4 +13,5 @@ public interface IPersonService
     Task<bool> DeletePerson(Guid id);
     Task<IAsyncEnumerable<PersonDto>> FindPeopleFromCompany(Guid companyId);
     Task<Note> AddNoteToPerson(Guid personId, CreateNoteDto noteDto);
+    Task DeleteNoteFromPerson(Guid personId, Guid noteId);
 }
