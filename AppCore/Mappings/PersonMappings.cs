@@ -17,7 +17,7 @@ public static class PersonMappings
             Position = person.Position,
             BirthDate = person.BirthDate,
             Gender = person.Gender,
-            EmployerId = person.Employer?.Id,
+            EmployerId = person.EmployerId,
             Status = person.Status,
             CreatedAt = person.CreatedAt,
             Address = person.Address is null
@@ -49,6 +49,7 @@ public static class PersonMappings
             Position = dto.Position,
             BirthDate = dto.BirthDate,
             Gender = dto.Gender,
+            EmployerId = dto.EmployerId,
             Address = dto.Address is null
                 ? null
                 : new Address
@@ -72,6 +73,9 @@ public static class PersonMappings
         if (dto.BirthDate is not null) person.BirthDate = dto.BirthDate;
         if (dto.Gender is not null) person.Gender = dto.Gender.Value;
         if (dto.Status is not null) person.Status = dto.Status.Value;
+
+        if (dto.EmployerId is not null)
+            person.EmployerId = dto.EmployerId;
 
         if (dto.Address is not null)
         {

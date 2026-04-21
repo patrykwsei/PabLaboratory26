@@ -14,7 +14,10 @@ public class Person : Contact
 
     public string? Position { get; set; }
 
+    public Guid? OrganizationId { get; set; }
     public Organization? Organization { get; set; }
+
+    public Guid? EmployerId { get; set; }
     public Company? Employer { get; set; }
 
     public override string GetDisplayName()

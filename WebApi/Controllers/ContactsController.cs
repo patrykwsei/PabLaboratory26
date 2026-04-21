@@ -75,10 +75,7 @@ public class ContactsController(IPersonService service) : ControllerBase
             CreatedAt = note.CreatedAt
         };
 
-        return CreatedAtAction(
-            nameof(GetNotes),
-            new { contactId },
-            noteDto);
+        return CreatedAtAction(nameof(GetNotes), new { contactId }, noteDto);
     }
 
     [HttpGet("{contactId:guid}/notes")]
@@ -87,7 +84,17 @@ public class ContactsController(IPersonService service) : ControllerBase
     public async Task<IActionResult> GetNotes([FromRoute] Guid contactId)
     {
         var person = await service.GetPerson(contactId);
-        return Ok(person.Notes);
+
+        var notes = person.Notes
+            .Select(n => new NoteDto
+            {
+                Id = n.Id,
+                Content = n.Content,
+                CreatedAt = n.CreatedAt
+            })
+            .ToList();
+
+        return Ok(notes);
     }
 
     [HttpDelete("{contactId:guid}/notes/{noteId:guid}")]

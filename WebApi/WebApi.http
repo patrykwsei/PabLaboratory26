@@ -5,30 +5,39 @@ GET {{WebApi_HostAddress}}/api/contacts?page=1&size=10
 Accept: application/json
 
 ### 2. dodanie osoby
-POST {{WebApi_HostAddress}}/api/contacts
+POST http://localhost:5288/api/contacts
 Content-Type: application/json
 
 {
-  "firstName": "Adam",
-  "lastName": "Nowak",
-  "email": "adam@wsei.edu.pl",
+  "firstName": "Patryk",
+  "lastName": "Testowy",
+  "email": "patryk@test.pl",
   "phone": "123456789",
   "position": "Student",
-  "birthDate": "2000-01-01T00:00:00",
-  "gender": 0
+  "birthDate": "2002-05-10",
+  "gender": 0,
+  "employerId": "516A34D7-CCFB-4F20-85F3-62BD0F3AF271",
+  "address": {
+    "street": "Testowa 1",
+    "city": "Krakow",
+    "postalCode": "30-001",
+    "country": "Poland",
+    "type": 0
+  }
 }
 
+
 ### 3. pobranie osoby p oid
-GET {{WebApi_HostAddress}}/api/contacts/b308643e-154a-424e-b925-4f27d34f9330
+GET {{WebApi_HostAddress}}/api/contacts/4e362867-5c73-47e3-9fd3-83970786bfc9
 Accept: application/json
 
 ### 4. edycja osoby po id
-PUT {{WebApi_HostAddress}}/api/contacts/b308643e-154a-424e-b925-4f27d34f9330
+PUT {{WebApi_HostAddress}}/api/contacts/b4dcb17c-f875-43f8-9d66-36597895a466
 Content-Type: application/json
 
 {
-  "firstName": "Janek",
-  "lastName": "Nowak",
+  "firstName": "marcin",
+  "lastName": "Kulak",
   "email": "jan@wsei.edu.pl",
   "phone": "999999999",
   "position": "Programista",
@@ -62,15 +71,15 @@ Content-Type: application/json
 }
 
 ### 8. dodanie notaki do osoby
-POST {{WebApi_HostAddress}}/api/contacts/94e32701-4603-4082-8584-fa2e0f55aa09/notes
+POST {{WebApi_HostAddress}}/api/contacts/4e362867-5c73-47e3-9fd3-83970786bfc9/notes
 Content-Type: application/json
 
 {
-  "content": "nowa notka2"
+  "content": "nowa notka ef test"
 }
 
 ### 9. pobranie notatek
-GET {{WebApi_HostAddress}}/api/contacts/94e32701-4603-4082-8584-fa2e0f55aa09/notes
+GET {{WebApi_HostAddress}}/api/contacts/4e362867-5c73-47e3-9fd3-83970786bfc9/notes
 Accept: application/json
 
 ### 10. handler test - nie ma osoby
@@ -82,4 +91,4 @@ Content-Type: application/json
 }
 
 ### 11. usuniecie notatki
-DELETE {{WebApi_HostAddress}}/api/contacts/94e32701-4603-4082-8584-fa2e0f55aa09/notes/115f8e59-79d8-4d9c-909b-67f50c355f00
+DELETE {{WebApi_HostAddress}}/api/contacts/1981917c-e7dd-4e1e-8ae9-d4375ada57eb/notes/dcaa06d6-1703-4e71-9341-be2a3d513323

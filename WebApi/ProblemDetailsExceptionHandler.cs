@@ -27,10 +27,22 @@ public class ProblemDetailsExceptionHandler(
             );
 
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
-            await context.Response.WriteAsJsonAsync(problem, cancellationToken);
+            await context.Response.WriteAsJsonAsync(problem);
             return true;
         }
 
-        return false;
+        logger.LogError(exception, "Unhandled exception");
+
+        var genericProblem = factory.CreateProblemDetails(
+            context,
+            StatusCodes.Status500InternalServerError,
+            "Unhandled server error",
+            "Server error",
+            detail: exception.ToString()
+        );
+
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        await context.Response.WriteAsJsonAsync(genericProblem);
+        return true;
     }
 }
