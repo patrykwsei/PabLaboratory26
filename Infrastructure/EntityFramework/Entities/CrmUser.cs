@@ -12,25 +12,26 @@ public class CrmUser : IdentityUser, ISystemUser
     public override required string Email { get; set; }
 
     public required string Department { get; set; }
-    public required SystemUserStatus Status { get; set; }
+    public required int Status { get; set; }
+
     public DateTime CreatedAt { get; set; }
     public DateTime? LastLoginAt { get; private set; }
     public DateTime? DeactivatedAt { get; private set; }
 
     public void Activate()
     {
-        if (Status == SystemUserStatus.Inactive)
+        if (Status == (int)SystemUserStatus.Inactive)
         {
-            Status = SystemUserStatus.Active;
+            Status = (int)SystemUserStatus.Active;
             DeactivatedAt = null;
         }
     }
 
     public void Deactivate(DateTime now)
     {
-        if (Status == SystemUserStatus.Active)
+        if (Status == (int)SystemUserStatus.Active)
         {
-            Status = SystemUserStatus.Inactive;
+            Status = (int)SystemUserStatus.Inactive;
             DeactivatedAt = now;
         }
     }

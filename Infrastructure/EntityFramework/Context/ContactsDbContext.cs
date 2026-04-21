@@ -2,6 +2,7 @@
 using AppCore.Models.Contacts;
 using AppCore.Models.Contacts.Enums;
 using Infrastructure.EntityFramework.Entities;
+using Infrastructure.Security;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +14,7 @@ public class ContactsDbContext : IdentityDbContext<CrmUser, CrmRole, string>
     public DbSet<Company> Companies { get; set; }
     public DbSet<Organization> Organizations { get; set; }
     public DbSet<Note> Notes { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     public ContactsDbContext()
     {
@@ -124,6 +126,15 @@ public class ContactsDbContext : IdentityDbContext<CrmUser, CrmRole, string>
                 .WithMany(c => c.Notes)
                 .HasForeignKey(n => n.ContactId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<RefreshToken>(entity =>
+        {
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.UserId).IsRequired();
+            entity.Property(x => x.Token).IsRequired();
+            entity.Property(x => x.CreatedAt).IsRequired();
+            entity.Property(x => x.ExpiresAt).IsRequired();
         });
 
         builder.Entity<Contact>().OwnsOne(c => c.Address, address =>

@@ -1,16 +1,18 @@
 using AppCore.Module;
 using Infrastructure.EntityFramework;
+using Infrastructure.Security;
 using WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
+builder.Services.AddSingleton<JwtSettings>();
+builder.Services.AddJwt(new JwtSettings(builder.Configuration));
+
 builder.Services.AddContactsCoreModule(builder.Configuration);
 builder.Services.AddContactsEfModule(builder.Configuration);
-// builder.Services.AddContactsMemoryModule(builder.Configuration);
 
 builder.Services.AddExceptionHandler<ProblemDetailsExceptionHandler>();
 builder.Services.AddProblemDetails();
@@ -25,6 +27,8 @@ if (app.Environment.IsDevelopment())
 app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
